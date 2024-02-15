@@ -36,7 +36,7 @@ public class TimeTrackNativeRuntimeHints implements RuntimeHintsRegistrar {
 
         // Auotmatically register DTOs by reflection (they must implement marker interface)
         try {
-            ClassPath classPath = ClassPath.from(TimetrackService.class.getClassLoader());
+            ClassPath classPath = ClassPath.from(classLoader);
             ImmutableSet<ClassPath.ClassInfo> classes = classPath.getTopLevelClassesRecursive("com.timetrack");
             for (ClassPath.ClassInfo classInfo : classes) {
                 Class clazz = Class.forName(classInfo.getName());
@@ -46,6 +46,7 @@ public class TimeTrackNativeRuntimeHints implements RuntimeHintsRegistrar {
                         !Modifier.isAbstract(clazz.getModifiers())) {
                     LOG.info("Registering native hint for {}", classInfo.getName());
                     hints.reflection().registerType(clazz,
+                            MemberCategory.DECLARED_FIELDS,
                             MemberCategory.INVOKE_PUBLIC_METHODS,
                             MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
                 }
