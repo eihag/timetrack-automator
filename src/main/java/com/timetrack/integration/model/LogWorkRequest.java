@@ -4,16 +4,13 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 
-public class LogWork extends AbstractDto {
+public class LogWorkRequest extends AbstractDto {
 
     private String timeSpent;
 
     private Date started;
 
-    public LogWork() {
-    }
-
-    public LogWork(String timeSpent, LocalDate localDate) {
+    public LogWorkRequest(String timeSpent, LocalDate localDate) {
         this.timeSpent = timeSpent;
         if (localDate != null) {
             this.started = Date.from(localDate
@@ -27,7 +24,7 @@ public class LogWork extends AbstractDto {
         return timeSpent;
     }
 
-    public LogWork setTimeSpent(String timeSpent) {
+    public LogWorkRequest setTimeSpent(String timeSpent) {
         this.timeSpent = timeSpent;
         return this;
     }
@@ -36,7 +33,7 @@ public class LogWork extends AbstractDto {
         return started;
     }
 
-    public LogWork setStarted(Date started) {
+    public LogWorkRequest setStarted(Date started) {
         this.started = started;
         return this;
     }

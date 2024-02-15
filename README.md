@@ -22,28 +22,32 @@ This utility automatically registers JIRA work log items on your active JIRA tas
 2. Log remaining time on active JIRA tasks
 
 ## Build + Configuration
-It is assumed you already have configured Java 21 / maven on your system.
+It is assumed you already have configured Java 21 / maven on your system for compiling. The build will create a native docker image.
 
 Steps:
 1. Configure - create a `application.properties` in `src/main/resources` directory. See `application-SAMPLE.properties`, rename, and fill in the blanks (JIRA username etc.).
-2. Compile `mvn clean install`
-3. Run - example: `java -jar timetrack-automator-1.0.0.jar dry-run 2024-02-14`
+2. Compile to native docker image `mvn -Pnative spring-boot:build-image`
+3. Run - example: `docker run timetrack-automator:1.0.0 dry-run today`
 
 
 ## Usage
 ```
-java -jar timetrack-automator-1.0.0.jar dry-run {<date> | today}
-java -jar timetrack-automator-1.0.0.jar log-work {<date> | today}
-java -jar timetrack-automator-1.0.0.jar report {month | year}
+docker run timetrack-automator:1.0.0 dry-run {<date> | today}
+docker run timetrack-automator:1.0.0 log-work {<date> | today}
+docker run timetrack-automator:1.0.0 report {month | year}
 ```
 
 Examples:
 ```
-java -jar timetrack-automator-1.0.0.jar log-work today
-java -jar timetrack-automator-1.0.0.jar log-work 2024-02-01
+docker run timetrack-automator:1.0.0 log-work today
+docker run timetrack-automator:1.0.0 log-work 2024-02-01
 
-java -jar timetrack-automator-1.0.0.jar report month 
-java -jar timetrack-automator-1.0.0.jar report year
+docker run timetrack-automator:1.0.0 report month 
+docker run timetrack-automator:1.0.0 report year
+```
+You can still also run the jar file directly:
+```
+java -jar timetrack-automator-1.0.0.jar dry-run today 
 ```
 
 
@@ -58,7 +62,7 @@ and enter the schedule.
 
 To run daily at 5pm:
 ```
-0 17 * * * java -jar /my/path/timetrack-automator-1.0.0.jar log-work today>/tmp/stdout.log 2>/tmp/stderr.log
+0 17 * * * docker run timetrack-automator:1.0.0 dry-run log-work today>/tmp/stdout.log 2>/tmp/stderr.log
 ```
 
 ## Limitations

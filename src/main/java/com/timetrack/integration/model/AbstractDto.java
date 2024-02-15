@@ -5,5 +5,5 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class AbstractDto {
+public abstract class AbstractDto implements NativeSerializable {
 }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.timetrack.integration.model.IssueList;
-import com.timetrack.integration.model.LogWork;
+import com.timetrack.integration.model.LogWorkRequest;
 import com.timetrack.integration.model.WorkLogList;
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.HttpMethod;
@@ -79,7 +79,7 @@ public class JiraRestClient {
         if (isToday(workingDate)) {
             workingDate = null;
         }
-        LogWork logWork = new LogWork(minutesSpent + "m", workingDate);
+        LogWorkRequest logWork = new LogWorkRequest(minutesSpent + "m", workingDate);
         call("/rest/internal/3/issue/" + issueKey + "/worklog?adjustEstimate=auto", Entity.json(logWork), HttpMethod.POST, Void.class);
     }
 
@@ -93,7 +93,7 @@ public class JiraRestClient {
             return response.readEntity(clazz);
         } catch (Exception e) {
             LOG.info("Failed to make HTTP request: {}", e.getMessage());
-            throw new RuntimeException("Failed to make HTTP request: " + e.getMessage(), e);
+            throw e;
         }
     }
 
