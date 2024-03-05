@@ -155,11 +155,10 @@ public class TimetrackService {
                     workLog.put(issue.getKey(), newWorkForIssue);
                     loggedWork = true;
                 }
-
-                if (!loggedWork) {
-                    LOG.error("Could not find active tasks with enough remaining time in estimate. Aborting");
-                    return null;
-                }
+            }
+            if (!loggedWork) {
+                LOG.error("Could not find active tasks with enough remaining time in estimate. Aborting");
+                return null;
             }
         }
         return workLog;
