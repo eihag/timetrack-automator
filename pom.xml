@@ -17,7 +17,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <guava.version>33.0.0-jre</guava.version>
+        <guava.version>33.1.0-jre</guava.version>
     </properties>
 
     <dependencies>
