@@ -17,7 +17,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <guava.version>33.3.0-jre</guava.version>
+        <guava.version>33.3.1-jre</guava.version>
         <xmlunit2.version>2.10.0</xmlunit2.version>
     </properties>
 
