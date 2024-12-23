@@ -18,7 +18,9 @@
     <properties>
         <java.version>21</java.version>
         <guava.version>33.4.0-jre</guava.version>
-        <xmlunit2.version>2.10.0</xmlunit2.version>
+
+         <!-- Overrides of https://github.com/spring-projects/spring-boot/blob/main/spring-boot-project/spring-boot-dependencies/build.gradle -->
+         <logback.version>1.5.13</logback.version>
     </properties>
 
     <dependencies>
