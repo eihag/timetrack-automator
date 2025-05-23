@@ -64,7 +64,7 @@ public class JiraRestClient {
     }
 
     public IssueList getMyIssuesWithWorkLoggedForDate(LocalDate date) {
-        return call("/rest/api/2/search?jql=assignee='" + username + "'%20AND%20worklogDate='" + date + "'", null, HttpMethod.GET, IssueList.class);
+        return call("/rest/api/2/search?jql=worklogAuthor='" + username + "'%20AND%20worklogDate='" + date + "'", null, HttpMethod.GET, IssueList.class);
     }
 
     public IssueList getMyActiveIssues() {
