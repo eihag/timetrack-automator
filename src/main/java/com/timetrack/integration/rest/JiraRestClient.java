@@ -33,6 +33,8 @@ import java.util.logging.Level;
 public class JiraRestClient {
     private static final Logger LOG = LoggerFactory.getLogger(JiraRestClient.class);
 
+    private static final String FIELD_LIST = "&fields=assignee,timetracking,summary&failFast=true";
+
     @Value("${jira_hostname}")
     private String hostname;
 
@@ -64,15 +66,15 @@ public class JiraRestClient {
     }
 
     public IssueList getMyIssuesWithWorkLoggedForDate(LocalDate date) {
-        return call("/rest/api/2/search?jql=worklogAuthor='" + username + "'%20AND%20worklogDate='" + date + "'", null, HttpMethod.GET, IssueList.class);
+        return call("/rest/api/3/search/jql?jql=worklogAuthor='" + username + "'%20AND%20worklogDate='" + date + "'" + FIELD_LIST, null, HttpMethod.GET, IssueList.class);
     }
 
     public IssueList getMyActiveIssues() {
-        return call("/rest/api/2/search?jql=assignee='" + username + "'%20AND%20status='" + UriEncoder.encode(activeState) + "'", null, HttpMethod.GET, IssueList.class);
+        return call("/rest/api/3/search/jql?jql=assignee='" + username + "'%20AND%20status='" + UriEncoder.encode(activeState) + "'" + FIELD_LIST, null, HttpMethod.GET, IssueList.class);
     }
 
     public WorkLogList getWorkLogDetails(String issueKey) {
-        return call("/rest/api/2/issue/" + issueKey + "/worklog", null, HttpMethod.GET, WorkLogList.class);
+        return call("/rest/api/3/issue/" + issueKey + "/worklog", null, HttpMethod.GET, WorkLogList.class);
     }
 
     public void createWorkLog(String issueKey, LocalDate workingDate, long minutesSpent) {

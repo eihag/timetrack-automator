@@ -28,4 +28,10 @@ class TimetrackServiceTest {
         timetrackService.trackTime(TimeTrackCommandLineRunner.parseDate("2024-02-01"), true);
     }
 
+    @Test
+    void reportMonth() {
+        timetrackService.reportTimeLogged("month");
+    }
+
+
 }

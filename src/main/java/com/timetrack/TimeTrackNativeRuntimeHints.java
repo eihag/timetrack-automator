@@ -4,7 +4,6 @@ package com.timetrack;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.ClassPath;
 import com.timetrack.integration.model.NativeSerializable;
-import com.timetrack.service.TimetrackService;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

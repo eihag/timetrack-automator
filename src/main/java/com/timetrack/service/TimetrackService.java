@@ -3,6 +3,7 @@ package com.timetrack.service;
 import com.timetrack.integration.model.Fields;
 import com.timetrack.integration.model.Issue;
 import com.timetrack.integration.model.IssueList;
+import com.timetrack.integration.model.TimeTracking;
 import com.timetrack.integration.model.WorkLog;
 import com.timetrack.integration.model.WorkLogList;
 import com.timetrack.integration.rest.JiraRestClient;
@@ -109,10 +110,11 @@ public class TimetrackService {
         }
         for (Issue issue : issues) {
             Fields fields = issue.getFields();
+            TimeTracking timeTracking = fields.getTimeTracking();
             LOG.info("{} ({}), Estimate: {}m, Spent: {}m, Remaining: {}m", issue.getKey(), fields.getSummary(),
-                    fields.getTimeOriginalEstimate() / 60,
-                    fields.getTimeSpent() / 60,
-                    (fields.getTimeOriginalEstimate() - fields.getTimeSpent()) / 60);
+                    timeTracking.getOriginalEstimate() / 60,
+                    timeTracking.getTimeSpent() / 60,
+                    (timeTracking.getOriginalEstimate() - timeTracking.getTimeSpent()) / 60);
         }
 
         LOG.info("Calculating new work....");
@@ -140,8 +142,9 @@ public class TimetrackService {
             boolean loggedWork = false;
             for (Issue issue : issues) {
                 Fields fields = issue.getFields();
+                TimeTracking timeTracking = fields.getTimeTracking();
                 long newWorkForIssue = workLog.getOrDefault(issue.getKey(), 0L);
-                long remainingOfEstimate = fields.getTimeOriginalEstimate() - fields.getTimeSpent() - newWorkForIssue;
+                long remainingOfEstimate = timeTracking.getOriginalEstimate() - timeTracking.getTimeSpent() - newWorkForIssue;
 
                 if (remainingOfEstimate > minimumWorkSeconds) {
                     if (remainingSeconds > minimumWorkSeconds) {

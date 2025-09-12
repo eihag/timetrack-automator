@@ -58,6 +58,11 @@ java -jar timetrack-automator-1.0.0.jar dry-run today
 ## Run automatically
 You can set up the time tracker to run automatically in a daily cron job.
 
+Copy binary executable to `/usr/local/bin`:
+```
+sudo cp ./target/timetrack-automator /usr/local/bin
+```
+
 From a command line run: 
 ```
 crontab -e
