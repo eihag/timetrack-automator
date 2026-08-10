@@ -19,7 +19,8 @@ This utility automatically registers JIRA work log items on your active JIRA tas
 
 ## Logic / Flow
 1. Verify how many hours already logged / how many hours missing
-2. Log remaining time on active JIRA tasks
+2. Fill up small tasks completely (smallest first) - see `small_task_threshold`
+3. Log the remaining time on the bigger active JIRA tasks
 
 ## Build + Configuration
 It is assumed you already have configured GraalVM / maven on your system for compiling. The build will create a native executable.
