@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,8 @@ public class TimetrackService {
     private Duration workPerDay;
     @Value("#{T(java.time.Duration).parse('${minimum_work_logged}')}")
     private Duration minimumWorkLogged;
+    @Value("#{T(java.time.Duration).parse('${small_task_threshold:PT2H}')}")
+    private Duration smallTaskThreshold;
 
     private final JiraRestClient restClient;
 
@@ -134,29 +137,39 @@ public class TimetrackService {
         }
     }
 
-    private Map<String, Long> calculateNewWork(long remainingSeconds, List<Issue> issues) {
+    Map<String, Long> calculateNewWork(long remainingSeconds, List<Issue> issues) {
         long minimumWorkSeconds = minimumWorkLogged.toSeconds();
+        long smallTaskSeconds = smallTaskThreshold.toSeconds();
 
-        Map<String, Long> workLog = new HashMap<>();
+        Map<String, Long> workLog = new LinkedHashMap<>();
+
+        // First pass: close small tasks completely, smallest first, so they do not
+        // linger for days while the hours keep flowing to the big estimates
+        List<Issue> smallestFirst = issues.stream()
+                .sorted(Comparator.comparingLong(issue -> remainingOfEstimate(issue, workLog)))
+                .toList();
+        for (Issue issue : smallestFirst) {
+            if (remainingSeconds <= 0) {
+                break;
+            }
+            long remainingOfEstimate = remainingOfEstimate(issue, workLog);
+            if (remainingOfEstimate > 0 && remainingOfEstimate <= smallTaskSeconds) {
+                remainingSeconds -= addWork(workLog, issue, Math.min(remainingOfEstimate, remainingSeconds));
+            }
+        }
+
+        // Second pass: spread what is left over the bigger tasks in minimum sized chunks
         while (remainingSeconds > 0) {
             boolean loggedWork = false;
             for (Issue issue : issues) {
-                Fields fields = issue.getFields();
-                TimeTracking timeTracking = fields.getTimeTracking();
-                long newWorkForIssue = workLog.getOrDefault(issue.getKey(), 0L);
-                long remainingOfEstimate = timeTracking.getOriginalEstimate() - timeTracking.getTimeSpent() - newWorkForIssue;
-
-                if (remainingOfEstimate > minimumWorkSeconds) {
-                    if (remainingSeconds > minimumWorkSeconds) {
-                        newWorkForIssue += minimumWorkSeconds;
-                        remainingSeconds -= minimumWorkSeconds;
-                    } else {
-                        // just log remaining time
-                        newWorkForIssue += remainingSeconds;
-                        remainingSeconds = 0;
-                    }
-                    workLog.put(issue.getKey(), newWorkForIssue);
-                    loggedWork = true;
+                if (remainingSeconds <= 0) {
+                    break;
+                }
+                long remainingOfEstimate = remainingOfEstimate(issue, workLog);
+                if (remainingOfEstimate >= minimumWorkSeconds) {
+                    long newWork = Math.min(Math.min(minimumWorkSeconds, remainingSeconds), remainingOfEstimate);
+                    remainingSeconds -= addWork(workLog, issue, newWork);
+                    loggedWork |= newWork > 0;
                 }
             }
             if (!loggedWork) {
@@ -165,6 +178,17 @@ public class TimetrackService {
             }
         }
         return workLog;
+    }
+
+    private static long addWork(Map<String, Long> workLog, Issue issue, long newWork) {
+        workLog.merge(issue.getKey(), newWork, Long::sum);
+        return newWork;
+    }
+
+    private static long remainingOfEstimate(Issue issue, Map<String, Long> workLog) {
+        TimeTracking timeTracking = issue.getFields().getTimeTracking();
+        long alreadyPlanned = workLog.getOrDefault(issue.getKey(), 0L);
+        return timeTracking.getOriginalEstimate() - timeTracking.getTimeSpent() - alreadyPlanned;
     }
 
     private int getIssueWorkLogTotals(Issue issue, LocalDate date, String myAccountId) {
